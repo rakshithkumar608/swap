@@ -1,0 +1,175 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+@import "leaflet/dist/leaflet.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-emergency: var(--emergency);
+  --color-emergency-glow: var(--emergency-glow);
+  --color-intel: var(--intel);
+  --color-intel-glow: var(--intel-glow);
+  --color-warning: var(--warning);
+  --color-safe: var(--safe);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+:root {
+  --radius: 0.5rem;
+  /* RESQAI dark emergency ops theme */
+  --background: oklch(0.16 0.018 250);
+  --foreground: oklch(0.96 0.01 240);
+  --surface: oklch(0.20 0.02 250);
+  --surface-elevated: oklch(0.24 0.025 252);
+  --card: oklch(0.20 0.02 250);
+  --card-foreground: oklch(0.96 0.01 240);
+  --popover: oklch(0.22 0.022 252);
+  --popover-foreground: oklch(0.96 0.01 240);
+  --primary: oklch(0.68 0.22 25);
+  --primary-foreground: oklch(0.98 0.005 240);
+  --secondary: oklch(0.28 0.03 252);
+  --secondary-foreground: oklch(0.96 0.01 240);
+  --muted: oklch(0.26 0.025 252);
+  --muted-foreground: oklch(0.68 0.025 250);
+  --accent: oklch(0.65 0.20 240);
+  --accent-foreground: oklch(0.98 0.005 240);
+  --destructive: oklch(0.65 0.25 25);
+  --destructive-foreground: oklch(0.98 0.005 240);
+  --border: oklch(0.32 0.03 252 / 0.5);
+  --input: oklch(0.28 0.03 252);
+  --ring: oklch(0.68 0.22 25);
+
+  --emergency: oklch(0.65 0.27 22);
+  --emergency-glow: oklch(0.72 0.25 22);
+  --intel: oklch(0.70 0.20 235);
+  --intel-glow: oklch(0.78 0.18 235);
+  --warning: oklch(0.78 0.18 75);
+  --safe: oklch(0.72 0.18 155);
+}
+
+.dark { color-scheme: dark; }
+
+html, body, #root { height: 100%; }
+
+@layer base {
+  * { border-color: var(--color-border); }
+  body {
+    background:
+      radial-gradient(ellipse at top left, oklch(0.22 0.04 25 / 0.25), transparent 60%),
+      radial-gradient(ellipse at bottom right, oklch(0.22 0.05 240 / 0.25), transparent 60%),
+      var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-display);
+    font-feature-settings: "ss01", "cv11";
+    overflow: hidden;
+  }
+}
+
+/* Glassmorphism */
+.glass {
+  background: linear-gradient(135deg, oklch(1 0 0 / 0.04), oklch(1 0 0 / 0.01));
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid oklch(1 0 0 / 0.08);
+}
+.glass-strong {
+  background: linear-gradient(135deg, oklch(1 0 0 / 0.07), oklch(1 0 0 / 0.02));
+  backdrop-filter: blur(24px) saturate(150%);
+  border: 1px solid oklch(1 0 0 / 0.10);
+}
+
+/* Scanline overlay */
+.scanlines::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(0deg, oklch(1 0 0 / 0.02) 0 1px, transparent 1px 3px);
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+/* Glows */
+.glow-emergency { box-shadow: 0 0 24px oklch(0.65 0.27 22 / 0.55), 0 0 80px oklch(0.65 0.27 22 / 0.25); }
+.glow-intel { box-shadow: 0 0 24px oklch(0.70 0.20 235 / 0.45), 0 0 80px oklch(0.70 0.20 235 / 0.20); }
+.text-glow-emergency { text-shadow: 0 0 12px oklch(0.65 0.27 22 / 0.7); }
+.text-glow-intel { text-shadow: 0 0 12px oklch(0.70 0.20 235 / 0.7); }
+
+/* Animations */
+@keyframes pulse-ring {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+.pulse-ring::after {
+  content: ""; position: absolute; inset: 0; border-radius: 9999px;
+  border: 2px solid currentColor; animation: pulse-ring 2s cubic-bezier(0.4,0,0.2,1) infinite;
+}
+@keyframes blink-crit { 0%,100% { opacity: 1; } 50% { opacity: 0.45; } }
+.blink { animation: blink-crit 1.2s ease-in-out infinite; }
+
+@keyframes radar-sweep {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.radar-sweep { animation: radar-sweep 4s linear infinite; transform-origin: center; }
+
+@keyframes ticker { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
+
+@keyframes data-flow {
+  0% { stroke-dashoffset: 200; }
+  100% { stroke-dashoffset: 0; }
+}
+
+/* Leaflet dark theme tweaks */
+.leaflet-container {
+  background: oklch(0.14 0.02 250) !important;
+  font-family: var(--font-display);
+}
+.leaflet-tile { filter: invert(0.92) hue-rotate(180deg) brightness(0.85) contrast(1.1) saturate(0.6); }
+.leaflet-control-attribution { background: oklch(0.14 0.02 250 / 0.7) !important; color: oklch(0.6 0.02 250) !important; font-size: 9px !important; }
+.leaflet-control-attribution a { color: oklch(0.7 0.1 235) !important; }
+.leaflet-control-zoom a {
+  background: oklch(0.20 0.02 250 / 0.85) !important;
+  color: oklch(0.95 0.01 240) !important;
+  border: 1px solid oklch(1 0 0 / 0.1) !important;
+  backdrop-filter: blur(8px);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: oklch(0.4 0.05 252 / 0.5); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: oklch(0.5 0.08 252 / 0.7); }
+
+/* View Transitions API — citizen tab surfaces (Chrome 111+) */
+::view-transition-group(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: 0.25s;
+  animation-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+}

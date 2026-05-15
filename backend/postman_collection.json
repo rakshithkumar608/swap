@@ -1,0 +1,132 @@
+﻿{
+  "info": {
+    "_postman_id": "f3a12d53-c98f-478f-b667-8f3d5ef2d901",
+    "name": "RESQAI Backend API (v1)",
+    "description": "Complete endpoint suite for backend/src/server.js routes.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {"method":"GET","url":"{{baseUrl}}/health"}
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "event": [{"listen":"test","script":{"exec":["const r = pm.response.json();","if (r?.data?.token) pm.environment.set('token', r.data.token);","if (r?.data?.user?._id) pm.environment.set('userId', r.data.user._id);"]}}],
+          "request": {
+            "method":"POST",
+            "header":[{"key":"Content-Type","value":"application/json"}],
+            "body":{"mode":"raw","raw":"{\n  \"name\": \"Admin User\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"Admin@123\",\n  \"role\": \"admin\",\n  \"phone\": \"9999999999\",\n  \"organisation\": \"RESQAI\"\n}"},
+            "url":"{{baseUrl}}/auth/register"
+          }
+        },
+        {
+          "name": "Login",
+          "event": [{"listen":"test","script":{"exec":["const r = pm.response.json();","if (r?.data?.token) pm.environment.set('token', r.data.token);","if (r?.data?.user?._id) pm.environment.set('userId', r.data.user._id);"]}}],
+          "request": {"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Admin@123\"\n}"},"url":"{{baseUrl}}/auth/login"}
+        },
+        {"name":"Get Me","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{baseUrl}}/auth/me"}},
+        {"name":"Update Me","request":{"method":"PUT","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"name\": \"Updated Admin\",\n  \"phone\": \"8888888888\",\n  \"organisation\": \"Control Room\"\n}"},"url":"{{baseUrl}}/auth/me"}},
+        {"name":"Register FCM Token","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"token\": \"sample-device-fcm-token\"\n}"},"url":"{{baseUrl}}/auth/fcm-token"}},
+        {"name":"Logout","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{baseUrl}}/auth/logout"}}
+      ]
+    },
+    {
+      "name": "Disasters",
+      "item": [
+        {"name":"Get Disasters","request":{"method":"GET","url":"{{baseUrl}}/disasters?status=active&page=1&limit=20"}},
+        {"name":"Get Disaster Stats","request":{"method":"GET","url":"{{baseUrl}}/disasters/stats"}},
+        {"name":"Get Nearby Disasters","request":{"method":"GET","url":"{{baseUrl}}/disasters/nearby?lat={{lat}}&lng={{lng}}&radius=50"}},
+        {"name":"Get Disasters By Type","request":{"method":"GET","url":"{{baseUrl}}/disasters/type/flood"}},
+        {"name":"Get Disaster By ID","request":{"method":"GET","url":"{{baseUrl}}/disasters/{{disasterId}}"}},
+        {"name":"Create Disaster","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"type\": \"flood\",\n  \"title\": \"Urban flooding near central station\",\n  \"description\": \"Water level rising rapidly\",\n  \"location\": {\n    \"type\": \"Point\",\n    \"coordinates\": [77.5946, 12.9716]\n  },\n  \"affectedRadius\": 8,\n  \"affectedPeople\": 500\n}"},"url":"{{baseUrl}}/disasters"}},
+        {"name":"Update Disaster","request":{"method":"PUT","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"severity\": \"high\",\n  \"description\": \"Situation worsening\"\n}"},"url":"{{baseUrl}}/disasters/{{disasterId}}"}},
+        {"name":"Update Disaster Status","request":{"method":"PATCH","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"status\": \"monitoring\"\n}"},"url":"{{baseUrl}}/disasters/{{disasterId}}/status"}},
+        {"name":"Delete Disaster (Admin)","request":{"method":"DELETE","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{baseUrl}}/disasters/{{disasterId}}"}}
+      ]
+    },
+    {
+      "name":"SOS",
+      "item":[
+        {"name":"Get SOS Reports","request":{"method":"GET","url":"{{baseUrl}}/sos?page=1&limit=30"}},
+        {"name":"Get SOS Stats","request":{"method":"GET","url":"{{baseUrl}}/sos/stats"}},
+        {"name":"Get SOS Clusters","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{baseUrl}}/sos/clusters"}},
+        {"name":"Get Nearby SOS","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{baseUrl}}/sos/nearby?lat={{lat}}&lng={{lng}}&radius=10"}},
+        {"name":"Get SOS By ID","request":{"method":"GET","url":"{{baseUrl}}/sos/{{sosId}}"}},
+        {"name":"Submit SOS","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"senderId\": \"device-001\",\n  \"senderName\": \"Rahul\",\n  \"message\": \"Need urgent help, water entering house\",\n  \"location\": {\n    \"type\": \"Point\",\n    \"coordinates\": [77.5946, 12.9716]\n  },\n  \"channel\": \"online\"\n}"},"url":"{{baseUrl}}/sos"}},
+        {"name":"Relay Ghost SOS","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"originalSosId\": \"ghost-abc-123\",\n  \"senderId\": \"relay-node-2\",\n  \"message\": \"Relayed SOS from offline area\",\n  \"location\": {\n    \"type\": \"Point\",\n    \"coordinates\": [77.6, 12.97]\n  },\n  \"channel\": \"ble\",\n  \"hops\": 2\n}"},"url":"{{baseUrl}}/sos/relay"}},
+        {"name":"Acknowledge SOS","request":{"method":"PATCH","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{baseUrl}}/sos/{{sosId}}/acknowledge"}},
+        {"name":"Resolve SOS","request":{"method":"PATCH","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{baseUrl}}/sos/{{sosId}}/resolve"}}
+      ]
+    },
+    {
+      "name":"Social",
+      "item":[
+        {"name":"Get Posts","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{baseUrl}}/social/posts?page=1&limit=30"}},
+        {"name":"Get SOS Feed","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{baseUrl}}/social/sos-feed"}},
+        {"name":"Get Panic Meter","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{baseUrl}}/social/panic-meter"}},
+        {"name":"Get Misinformation","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{baseUrl}}/social/misinformation"}},
+        {"name":"Get Clusters","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{baseUrl}}/social/clusters"}},
+        {"name":"Get Post By ID","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{baseUrl}}/social/posts/{{postId}}"}},
+        {"name":"Ingest Post","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"platform\": \"manual\",\n  \"text\": \"People trapped near river bridge, need rescue boats\",\n  \"author\": \"local-reporter\",\n  \"locationText\": \"River bridge\"\n}"},"url":"{{baseUrl}}/social/posts"}},
+        {"name":"Batch Ingest Posts","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"posts\": [\n    {\n      \"platform\": \"manual\",\n      \"text\": \"Road blocked due to flooding near market\",\n      \"author\": \"citizen-1\"\n    },\n    {\n      \"platform\": \"manual\",\n      \"text\": \"Power restored in ward 7\",\n      \"author\": \"citizen-2\"\n    }\n  ]\n}"},"url":"{{baseUrl}}/social/posts/batch"}},
+        {"name":"Flag Post","request":{"method":"PATCH","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"flag\": true\n}"},"url":"{{baseUrl}}/social/posts/{{postId}}/flag"}}
+      ]
+    },
+    {
+      "name":"Shelters",
+      "item":[
+        {"name":"Get Shelters","request":{"method":"GET","url":"{{baseUrl}}/shelters"}},
+        {"name":"Get Nearby Shelters","request":{"method":"GET","url":"{{baseUrl}}/shelters/nearby?lat={{lat}}&lng={{lng}}&radius=20"}},
+        {"name":"Get Shelter By ID","request":{"method":"GET","url":"{{baseUrl}}/shelters/{{shelterId}}"}},
+        {"name":"Create Shelter","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"name\": \"City School Shelter\",\n  \"address\": \"MG Road, Bengaluru\",\n  \"location\": {\n    \"type\": \"Point\",\n    \"coordinates\": [77.5946, 12.9716]\n  },\n  \"capacity\": 300,\n  \"occupancy\": 50,\n  \"facilities\": [\"food\", \"water\", \"medical\"]\n}"},"url":"{{baseUrl}}/shelters"}},
+        {"name":"Update Shelter","request":{"method":"PUT","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"status\": \"open\",\n  \"contactPhone\": \"9876543210\"\n}"},"url":"{{baseUrl}}/shelters/{{shelterId}}"}},
+        {"name":"Update Occupancy","request":{"method":"PATCH","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"delta\": 10\n}"},"url":"{{baseUrl}}/shelters/{{shelterId}}/occupancy"}}
+      ]
+    },
+    {
+      "name":"Resources",
+      "item":[
+        {"name":"Get Resources","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{baseUrl}}/resources"}},
+        {"name":"Get Resource Summary","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{baseUrl}}/resources/summary"}},
+        {"name":"Create Resource","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"name\": \"Rescue Boat\",\n  \"category\": \"vehicle\",\n  \"quantity\": 2,\n  \"unit\": \"boats\",\n  \"location\": {\n    \"type\": \"Point\",\n    \"coordinates\": [77.59, 12.97]\n  }\n}"},"url":"{{baseUrl}}/resources"}},
+        {"name":"Deploy Resource","request":{"method":"PATCH","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"disasterId\": \"{{disasterId}}\"\n}"},"url":"{{baseUrl}}/resources/{{resourceId}}/deploy"}},
+        {"name":"Return Resource","request":{"method":"PATCH","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{baseUrl}}/resources/{{resourceId}}/return"}}
+      ]
+    },
+    {
+      "name":"Alerts",
+      "item":[
+        {"name":"Get Alerts","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{baseUrl}}/alerts?page=1&limit=30"}},
+        {"name":"Get Active Alerts","request":{"method":"GET","url":"{{baseUrl}}/alerts/active"}},
+        {"name":"Get Alert By ID","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{baseUrl}}/alerts/{{alertId}}"}},
+        {"name":"Send Alert (Admin)","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"title\": \"Flood Warning\",\n  \"body\": \"Move to higher ground immediately\",\n  \"type\": \"disaster\",\n  \"severity\": \"critical\",\n  \"targetTopics\": [\"all-users\"]\n}"},"url":"{{baseUrl}}/alerts/send"}},
+        {"name":"Broadcast Alert (Admin)","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"title\": \"General Advisory\",\n  \"body\": \"Avoid travel in flood-prone zones\"\n}"},"url":"{{baseUrl}}/alerts/broadcast"}},
+        {"name":"Evacuate Alert (Admin)","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"title\": \"Zone 3 evacuation\",\n  \"body\": \"Evacuate immediately to nearest shelter\",\n  \"disasterId\": \"{{disasterId}}\",\n  \"targetTopics\": [\"all-users\"]\n}"},"url":"{{baseUrl}}/alerts/evacuate"}},
+        {"name":"Cancel Alert (Admin)","request":{"method":"PATCH","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{baseUrl}}/alerts/{{alertId}}/cancel"}}
+      ]
+    },
+    {
+      "name":"Rescue Routes",
+      "item":[
+        {"name":"Get Routes","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{baseUrl}}/routes"}},
+        {"name":"Get Active Routes","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{baseUrl}}/routes/active"}},
+        {"name":"Get Route By ID","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{baseUrl}}/routes/{{routeId}}"}},
+        {"name":"Calculate Route","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"origin\": { \"lat\": 12.9716, \"lng\": 77.5946 },\n  \"destination\": { \"lat\": 12.9352, \"lng\": 77.6245 },\n  \"profile\": \"driving-car\",\n  \"blockedRoads\": [],\n  \"avoidAreas\": [],\n  \"disasterId\": \"{{disasterId}}\"\n}"},"url":"{{baseUrl}}/routes/calculate"}},
+        {"name":"Recalculate Route","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"blockedRoads\": [\n    { \"lat\": 12.96, \"lng\": 77.60, \"reason\": \"waterlogging\" }\n  ]\n}"},"url":"{{baseUrl}}/routes/recalculate/{{routeId}}"}},
+        {"name":"Block Road","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"lat\": 12.96,\n  \"lng\": 77.60,\n  \"reason\": \"bridge collapse\"\n}"},"url":"{{baseUrl}}/routes/{{routeId}}/block"}},
+        {"name":"Update Route","request":{"method":"PUT","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"status\": \"completed\"\n}"},"url":"{{baseUrl}}/routes/{{routeId}}"}},
+        {"name":"Delete Route (Admin)","request":{"method":"DELETE","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{baseUrl}}/routes/{{routeId}}"}}
+      ]
+    }
+  ]
+}
+
